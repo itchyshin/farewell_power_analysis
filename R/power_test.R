@@ -50,9 +50,9 @@ pwr.t.test(d = 0.67, power = 0.8)
 short_cut(d = 0.67, method = "normal")
 
 # sex difference = INCORRECT!!
-pwr.t.test(d = 0.33, power = 0.8) # incorrect
+pwr.t.test(d = 0.33, power = 0.8) # correct
 short_cut(d = 0.33) # incorrect
-short_cut(d = 0.33, method = "interaction")
+short_cut(d = 0.33, method = "interaction") # close enough
 
 # the second set (realstic samll effect)
 # female control: mean = 100, sd = 30
@@ -95,7 +95,7 @@ short_cut(d = 0.067, method = "interaction")
 
 design <- ANOVA_design(
   design = "2b*2b", # indepdent design
-  n =286, 
+  n =290, 
   mu = c(130, 100, 120, 100), 
   sd = 30)
 
@@ -106,7 +106,7 @@ ANOVA_power(design, alpha = 0.05,nsims = 1000, seed = 1234)
 # assuming the siblings are very similar to each other - r = 0.5
 design2 <- ANOVA_design(
   design = "2w*2w", # depedent design
-  n =143, 
+  n =145, 
   r = 0.5,
   mu = c(130, 100, 120, 100), 
   sd = 30)
@@ -116,7 +116,7 @@ ANOVA_exact(design2, alpha_level = 0.05)
 # assuming the siblings are very similar to each other - r = 0.25
 design3 <- ANOVA_design(
   design = "2w*2w", # depedent design 
-  n =215, 
+  n =217, 
   r = 0.25,
   mu = c(130, 100, 120, 100), 
   sd = 30)

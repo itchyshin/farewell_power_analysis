@@ -1,8 +1,15 @@
 ---
-title: 'An Essay prepared for PLoS Biology – Farewell to Power Analysis: The Celebrated Kin to the Infamous Statistical Significance'
+title: 'Farewell to Power Analysis\: The Celebrated Kin to the Infamous Statistical
+  Significance'
 author: "Shinichi Nakagawa, Malgorzata Lagisz, Yefeng Yang & Szymon Drobniak"
 date: "February 2022"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
+  word_document:
+    toc: yes
+    toc_depth: '4'
   html_document:
     toc: yes
     toc_depth: 4
@@ -20,30 +27,31 @@ output:
     cache: yes
     df_print: paged
     code_folding: hide
-    theme:  flatly
-  word_document:
-    toc: yes
-    toc_depth: '4'
+    theme: flatly
+always_allow_html: true
 editor_options:
   chunk_output_type: console
 subtitle: Electronic Supplementary Material
 bibliography: references.bib
-# biblio-style: "apalike"
 csl: plos.csl
 link-citations: yes
 ---
 
 ```{r}
-###################################################################
+###########################################################################
 # Supplementary Material for Farewell to Power Analysis
 #
 # Code written by:
 #
-#         Yefeng Yang (yefeng.yang1@unsw.edu.au); School of Biological, Earth and Environmental Sciences, University of New South Wales, Sydney, Australia  
+#         Yefeng Yang (yefeng.yang1@unsw.edu.au); School of Biological, 
+#                                     Earth and Environmental Sciences, 
+#                     University of New South Wales, Sydney, Australia  
 #
-#         Shinichi Nakagawa (s.nakagawa@unsw.edu.au); School of Biological, Earth and Environmental Sciences, University of New South Wales, Sydney, Australia
+#         Shinichi Nakagawa (s.nakagawa@unsw.edu.au); School of Biological, 
+#                                     Earth and Environmental Sciences, 
+#                     University of New South Wales, Sydney, Australia  
 #
-###################################################################        
+############################################################################        
 ```
 
 ```{r setup, include=FALSE}
@@ -56,15 +64,12 @@ knitr::opts_chunk$set(
   cache = TRUE, 
   echo=TRUE
 )
-
-# cleaning up
-rm(list=ls())
 ```
 
 
 # Setups
 
-Loading packages and custom functions. If your computer do not have the required packages, please install them via install.packages("")
+Loading packages and custom functions. If your computer do not have the required packages, please install them via `install.packages("package.name")`
 
 ```{r setups, include=FALSE}
 # load required packages
@@ -91,13 +96,13 @@ Although grant agencies and ethics committees require PIs to estimate sample siz
 
 # A proposed experiment in your grant and ethic applications
 
-Suppose your research interests focus on intergenerational effects (maternal/paternal effects). Based on your experience and a pilot, you are expecting to find a new, and novel discovery in terms of maternal effect: maternal obesogenic diet is likely to have a large effect on offspring’s memory tasks in mice and sex-specific differences in the tasks (Fig 1). You are planning to apply for a grant to elucidate this maternal diet effect. When writing the proposal, the grant agency is asking you to use power analysis to determine how many mice will be used to test your new hypothesis.
+Suppose your research interests focus on inter-generational effects (maternal/paternal effects). Based on your experience and a pilot, you are expecting to find a new, and novel discovery in terms of maternal effect: maternal obesogenic diet is likely to have a large effect on offspring’s memory tasks in mice and sex-specific differences in the tasks (Fig 1). You are planning to apply for a grant to elucidate this maternal diet effect. When writing the proposal, the grant agency is asking you to use power analysis to determine how many mice will be used to test your new hypothesis.
 
 # Theoretical knowledge of power analysis
 
 To boost the understanding of the power analysis, in this section, we introduce some basic statistical concepts related to the power analysis. For any experimental design, the power of the designed experiment depends on three parameters: 
 
-(1) Type I error probability, $α$, also known as significance threshold, which is usually fixed at 0.05 (see Table I);
+(1) Type I error probability, $\alpha$, also known as significance threshold, which is usually fixed at 0.05 (see Table I);
 
 (2) sample size, $n$, that is the number of animals will be used in your proposed experiment;
 
@@ -165,7 +170,7 @@ power_plot
 ## Figure S1
 An example showing how the three parameters affect the statistical power of a given experiment: (A) Type I error ($α$), (B) Sample size ($n$), (C) Magnitude of the standardised effect size ($d$). These figures are simulated using <code>retro_design()</code> function in <code>retrodesign</code> package @gelman2014beyond. See the corresponding code chunk for detailed code.
 
-From Figure S1A we can see that when an experiment commits a higher Type 1 error, it is easier to achieve a desired statistical power (i.e., Cohen's recommendation: 80% power). Increasing sample size ($n$) and magnitude of standardised effect size are effective ways to increase the statistical power of a given experiment (Figure S1B and S1C). 
+From Figure S1A we can see that when an experiment commits a higher Type 1 error, it is easier to achieve a desired statistical power (i.e., Cohen's recommendation: 80% power). Increasing sample size ($n$) and magnitude of standardized effect size are effective ways to increase the statistical power of a given experiment (Figure S1B and S1C). 
 
 # Estimating sample size in your proposed experiment
 
@@ -222,13 +227,13 @@ $$
 When estimating sample size for the interaction effect, i.e., sex difference in a treatment effect, you need to replace 16 with 32 as interaction involves four groups rather than two.
 
 In the following section, we use our custom function (based on the above formula)
-and one existing R package <code>pwr</code> to estimate the sample size used in your proposed experiment with different scenarios (sample size mentioned in the fictitious story in the main text). We also validate the sample size estimates using another package <code>Superpower</code>.
+and one existing R package `pwr` to estimate the sample size used in your proposed experiment with different scenarios (sample size mentioned in the fictitious story in the main text). We also validate the sample size estimates using another package <code>Superpower</code>.
 
 ```{r, results='hide'}
 
-##################
+###################
 # power calculation
-##################
+###################
 
 # 2 independent group situation (assumed)
 
@@ -237,7 +242,7 @@ and one existing R package <code>pwr</code> to estimate the sample size used in 
 # male control: mean = 100, sd = 30
 # male experiment: mean = 130, sd = 30
 
-# to meet the assumption of homogeneity of variance, both treatment and control groups share a common sd. In such a case, the pooled sd also equals 30. Otherwise, this criticial assumption would be violated and you need to get weighed average via sd^2 (variance).
+# to meet the assumption of homogeneity of variance, both treatment and control groups share a common sd. In such a case, the pooled sd also equals 30. Otherwise, this critical assumption would be violated and you need to get weighed average via sd^2 (variance).
 
 # cohen's d female
 (120 - 100)/30
@@ -395,7 +400,7 @@ plot.power3$plot_ANOVA + labs(x = "Sample size per group", title = "correlation 
 ```
 
 ## Figure S5
-Power curves for large intergenerational effect in an independent design when assuming a relatively high correlation for within-animal factor. Top panel = the main effect - diet; Middle panel = the main effect - sex; Bottom panel = the interactive effect, sex difference. The orange horizontal lines denote the expected statistical power (80%).
+Power curves for large inter-generational effect in an independent design when assuming a relatively high correlation for within-animal factor. Top panel = the main effect - diet; Middle panel = the main effect - sex; Bottom panel = the interactive effect, sex difference. The orange horizontal lines denote the expected statistical power (80%).
 
 It seems that increasing the correlation ($r$) in a dependent design can reduce the required sample size. Actually, there is a formula to roughly approximate the sample size required in a dependent design ($n_\text{dependent}$), based on the sample size required in an independent design ($n_\text{independent}$) (ref):
 
@@ -440,7 +445,7 @@ text(x=2, y=0.32, labels="Sampling distribution", col="black")
 ## Figure S6
 An example showing how small study (small sample size) exaggerate observed effect size to reach statistical significance ($p_\text{two-tailed}%$ < 0.05).
 
-Let's consider that you get funded. Awesome! Now you are running this maternal diet experiment. However, the measurements in your pilot are so noisy that this intergenerational effect you used to for power analysis is actually exaggerated. The true effect underlying this maternal diet experiment is subtle and variable: $d_\text{true}$ = 0.2, $sd[d]_\text{population}$ = 1 for male treatment effect. Based on your power analysis, you need to use $n_\text{male}$ = `r round(pwr_independent_m_d1, 0)` male mice to investigate male treatment effect (i.e., independent design). Running an experiment with this sample size ($n_\text{male}$ = `r round(pwr_independent_m_d1, 0)`) will have a sampling uncertainty (standard error of the effect size) of $se[d]$ = $sd[d]_\text{sample}$ = $sd[d]_\text{population}/\sqrt{n_\text{male}}$ = `r 1/sqrt(round(pwr_independent_m_d1, 0))`. As shown in Figure S6, to obtain a significant intergenerational effect, your observed effect size $d_\text{observed}$ need to exceed `r qt(1 - 0.05/2,  round(pwr_independent_m_d1, 0) - 1)*(1/sqrt(round(pwr_independent_m_d1, 0)))` to achieve significance at $p_\text{two-tailed}%$ < 0.05 under the null hypothesis significance test framework (in this case, sampling follows a t distribution with a freedom of $df$ = `r round(pwr_independent_m_d1, 0) - 1`). `r qt(1 - 0.05/2,  round(pwr_independent_m_d1, 0) - 1)*(1/sqrt(round(pwr_independent_m_d1, 0)))` is a critical effect size level ($d_\text{threshold}$), which can be obtained through $se[d]$ (or $sd[d]_\text{sample}$) times a critical value ($Z_\text{threshold}$), which represents the 97.5th percentile of a t-distribution with degrees of freedom $df$ = `r round(pwr_independent_m_d1, 0) - 1`. You may become one-in-twenty lucky winner who happen to get $d_\text{observed}$ > $d_\text{threshold}$ at $p_\text{two-tailed}%$ < 0.05 so you successfully publish your $d_\text{observed}$ although it is ‘inflated’. Unfortunately, later PIs, who are interested in a similar intergenerational effect, will use your published ‘inflated’ effect size as a 'true' effect size to calculate sample size (using power analysis) in their grant proposals. Collectively, you initiate a vicious cycle of power analysis (Fig 2) and later PIs unintentionally keep this unfortunate cycle going and, ultimately, exacerbating replication crisis (referred to as winner’s curse; see the main text). 
+Let's consider that you get funded. Awesome! Now you are running this maternal diet experiment. However, the measurements in your pilot are so noisy that this inter-generational effect you used to for power analysis is actually exaggerated. The true effect underlying this maternal diet experiment is subtle and variable: $d_\text{true}$ = 0.2, $sd[d]_\text{population}$ = 1 for male treatment effect. Based on your power analysis, you need to use $n_\text{male}$ = `r round(pwr_independent_m_d1, 0)` male mice to investigate male treatment effect (i.e., independent design). Running an experiment with this sample size ($n_\text{male}$ = `r round(pwr_independent_m_d1, 0)`) will have a sampling uncertainty (standard error of the effect size) of $se[d]$ = $sd[d]_\text{sample}$ = $sd[d]_\text{population}/\sqrt{n_\text{male}}$ = `r 1/sqrt(round(pwr_independent_m_d1, 0))`. As shown in Figure S6, to obtain a significant intergenerational effect, your observed effect size $d_\text{observed}$ need to exceed `r qt(1 - 0.05/2,  round(pwr_independent_m_d1, 0) - 1)*(1/sqrt(round(pwr_independent_m_d1, 0)))` to achieve significance at $p_\text{two-tailed}%$ < 0.05 under the null hypothesis significance test framework (in this case, sampling follows a t distribution with a freedom of $df$ = `r round(pwr_independent_m_d1, 0) - 1`). `r qt(1 - 0.05/2,  round(pwr_independent_m_d1, 0) - 1)*(1/sqrt(round(pwr_independent_m_d1, 0)))` is a critical effect size level ($d_\text{threshold}$), which can be obtained through $se[d]$ (or $sd[d]_\text{sample}$) times a critical value ($Z_\text{threshold}$), which represents the 97.5th percentile of a t-distribution with degrees of freedom $df$ = `r round(pwr_independent_m_d1, 0) - 1`. You may become one-in-twenty lucky winner who happen to get $d_\text{observed}$ > $d_\text{threshold}$ at $p_\text{two-tailed}%$ < 0.05 so you successfully publish your $d_\text{observed}$ although it is ‘inflated’. Unfortunately, later PIs, who are interested in a similar intergenerational effect, will use your published ‘inflated’ effect size as a 'true' effect size to calculate sample size (using power analysis) in their grant proposals. Collectively, you initiate a vicious cycle of power analysis (Fig 2) and later PIs unintentionally keep this unfortunate cycle going and, ultimately, exacerbating replication crisis (referred to as winner’s curse; see the main text). 
 
 Statistically speaking, your experiment with $n_\text{male}$ = `r round(pwr_independent_m_d1, 0)` must overestimate this intergenerational effect by `r ( qt(1 - 0.05/2,  round(pwr_independent_m_d1, 0) - 1)*(1/sqrt(round(pwr_independent_m_d1, 0))) ) / (0.2)` ($d_\text{threshold}/d_\text{true}$) to achieve significance at $p_\text{two-tailed}%$ < 0.05. Otherwise, you rarely can publish your results according to the filtering effect of publication process based statistical significance. Alternatively, you can increase the sample size $n$ to decrease sampling uncertainty (standard error of the effect size) of $sd[d]_\text{sample}$ = $se[d]$ = $sd[d]_\text{population}/\sqrt{n_\text{male}}$ to avoid overestimation of the magnitude of the effect size (Fig S7; the script to reproduce this figure can be found at the above code chunk). However, in reality, your experiment often needs an unrealistically large sample size, which leads to another issue: there is no incentives for reporting realistic sample sizes required for making new and reliable discoveries (see next section). 
 
@@ -498,7 +503,7 @@ meanplot_smallES
 ```
 
 ## Figure S8 
-Visualization of the expected means and standard deviation (sd) of each group when assuming maternal obesogenic diet has a realistic and small intergenerational effect. Error bars represent ± sd.
+Visualization of the expected means and standard deviation (sd) of each group when assuming maternal obesogenic diet has a realistic and small inter-generational effect. Error bars represent ± sd.
 
 You still need to assume all groups share a common sd = 30 (population standard deviation). Otherwise, you will violate the assumption of homogeneity of variances. Then you can obtain the following standardized mean difference $d$:
 
@@ -506,7 +511,7 @@ You still need to assume all groups share a common sd = 30 (population standard 
 
 (2) 0.1, corresponding to 3% increase of memory in females after intervention by diet;
 
-(3) 0.06, corresponding to sex difference or interaction between diet and sex.
+(3) 0.06, corresponding to 2% sex difference or interaction between diet and sex.
 
 Following similar procedures in estimating sample sizes for large effects (see above), you can obtain sample sizes for small effects. That is, replacing all the values of large effects in corresponding R syntax with the values of small effects.
 
@@ -565,7 +570,7 @@ By specifying the argument <code>d</code> with 0.167 (male treatment effect) & 0
 We use a similar simulation-based approach to empirically calculate power for independent experiment design for small effects. Your experiment involves a 2b X 2b design which means you have two between-animal factors each with two groups/levels. The first factor (diet intervention) has two groups (obesogenic diet vs. control diet), whereas the second factor (sex) also has two groups (male vs. female). Let's examine what would happen if we collect data from $n$ = `r round(pwr_independent_i_d0.067, 0)` F1 mice in each group (sample size required for sex difference; see sample size required in an independent design). In other words, when detecting a sex difference, will collecting data from pre-defined number ($n$ = `r round(pwr_independent_i_d0.067, 0)`) of F1 mice in each group be enough for an ANOVA to have sufficient power. 
 
 ## Table S2
-A simulated dataset that has exactly the expected mean and standard deviation specific to the realistic and small intergenerational effect (Figure S8). For the code to reproduce the simulated dataset, see the corresponding code chunk.
+A simulated dataset that has exactly the expected mean and standard deviation specific to the realistic and small inter-generational effect (Figure S8). For the code to reproduce the simulated dataset, see the corresponding code chunk.
 
 ```{r}
 ### retrieve the simulated dataset

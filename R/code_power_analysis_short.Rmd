@@ -319,7 +319,7 @@ meanplot_smallES
 ### Figure S4
 Visualization of the expected means and standard deviation (sd) of each group using the package `Superpower` under more realistic scenarios. Error bars represent sd. Here we assume each group is independent (note that this is not quite true if we take one male and one female from one mother but for convenience, let's assume this).
 
-# Presumed effect sizes (small)
+## Presumed effect sizes (small)
 
 As with the above, we assumed all groups share a common sd = 30 (population standard deviation). Then you can obtain the following standardized mean difference $d$:
 

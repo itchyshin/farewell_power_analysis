@@ -52,7 +52,7 @@ link-citations: yes
 
 # Setups
 
-```{r setups}
+```{r setups, echo=FALSE}
 # overall Rmarkdown settings
 knitr::opts_chunk$set(include = TRUE, message = FALSE,warning = FALSE,
                       tidy.opts = list(width.cutoff = 60),tidy = TRUE, 

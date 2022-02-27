@@ -2,8 +2,14 @@
 title: 'Farewell to Power Analysis\: The Celebrated Kin to the Infamous Statistical
   Significance'
 author: "Shinichi Nakagawa, Malgorzata Lagisz, Yefeng Yang & Szymon Drobniak"
-date: "February 2022"
+date:  "`r format(Sys.time(), '%d %B %Y')`"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: 4
+  word_document:
+    toc: yes
+    toc_depth: 4
   html_document:
     toc: yes
     toc_depth: 4
@@ -20,14 +26,8 @@ output:
     tidy: yes
     cache: yes
     df_print: paged
-    code_folding: hide
+    #code_folding: hide
     theme: flatly
-  word_document:
-    toc: yes
-    toc_depth: '4'
-  pdf_document:
-    toc: yes
-    toc_depth: '4'
 always_allow_html: true
 editor_options:
   chunk_output_type: console
@@ -40,40 +40,28 @@ link-citations: yes
 ```{r}
 ###########################################################################
 # Supplementary Material for Farewell to Power Analysis
-#
 # Code written by:
-#
 #         Yefeng Yang (yefeng.yang1@unsw.edu.au); School of Biological, 
 #                                     Earth and Environmental Sciences, 
 #                     University of New South Wales, Sydney, Australia  
-#
 #         Shinichi Nakagawa (s.nakagawa@unsw.edu.au); School of Biological, 
 #                                     Earth and Environmental Sciences, 
 #                     University of New South Wales, Sydney, Australia  
-#
 ############################################################################        
 ```
 
-```{r setup, include=FALSE}
-# Load packages and custom functions
-# knitr setting
-knitr::opts_chunk$set(
-  message = FALSE,
-  warning = FALSE, 
-  tidy = TRUE,
-  cache = TRUE, 
-  echo=TRUE
-)
-```
-
-
 # Setups
 
-Loading packages and custom functions. If your computer do not have the required packages, please install them via `install.packages("package.name")`
+```{r setups}
+# overall Rmarkdown settings
+knitr::opts_chunk$set(include = TRUE, message = FALSE,warning = FALSE,
+                      tidy.opts = list(width.cutoff = 60),tidy = TRUE, 
+                      cache = TRUE, echo=TRUE)
+```
 
-```{r setups, include=FALSE}
+Loading packages and custom functions. If your computer do not have the required packages, please install them via `install.packages("package.name")`
+```{r installing}
 # load required packages
-knitr::opts_chunk$set(echo = F, warning = F, message = F)
 pacman::p_load(dplyr,magrittr, tidyr, stringr, ggplot2, cowplot, patchwork, tidyverse, here, readxl, retrodesign, pwr, Superpower, pander)
 
 # custom function for approximate sample size for main effect and interactive effect
@@ -90,7 +78,7 @@ short_cut <- function(d, method = c("normal", "interaction")){
 
 # Aims of this Supporting Information
 
-In this document, we show how we got sample sizes presented in the main text in two scenarios under: 1) with relatively large effect sizes and 2). In addition, we illustrate two more points relevant to our main text: I) how correlated samples can increase statistical power, and II) how inflated effect sizes can arise from . 
+In this document, we show how we got sample sizes presented in the main text in two scenarios under: 1) with relatively large effect sizes (1) and with small but realistic effect sizes (2). In addition, we provide an example of how correlated samples can increase statistical power (3).
 
 # Preambles
 
@@ -103,22 +91,26 @@ Statistical power are determined by the following three parameters:
 (3) standardized effect size, $E[\theta]/\sqrt{Var[\theta]}$, where $\theta$ is the effect size of interest, which is indicated by the real difference between two groups (in our case: obesogenic diet vs. control diet), $E[\theta]$ is the population average/expectation, and $Var[\theta]$ is the respective variance; note that standardized mean difference $d$ is an example of a standardized effect size (for more on effect size, see also Fig 2 and Box 2). 
 
 ```{r fig.height= 5}
-### Parameter 1: α level vs. power
+# drawing Fig 1
+### Parameter 1: alpha level vs. power
 
 #### set a range of alpha levels (0.01 to 0.1)
 alpha_range <- seq(0.001,1,by=0.01)
 
 #### calculate power at the set alpha levels
-power_range <- retrodesign::retro_design(A = 0.5, s = 0.2, alpha = alpha_range) # using a medium magnitude of standardised effect size 0.5 with a standard deviation of 0.2 
+#using a medium magnitude of standardized effect size 0.5 
+#with a standard deviation of 0.2 
+power_range <- retro_design(A = 0.5, s = 0.2, alpha = alpha_range) 
 
-#### create a dataframe
+#### create a data frame
 power_vs_alpha <- data.frame(alpha = alpha_range, power = power_range$power)
 
 #### plot
 power_vs_alpha_plot <- ggplot(power_vs_alpha) + geom_line(aes(x=alpha,y=power),show.legend=F) + 
   scale_y_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1)) +
   geom_hline(yintercept = 0.8, colour = "red") +
-  labs(x="Type 1 error (alpha)", y="Statistical power", title = "(A) alpha level vs. power") + theme_bw()
+  labs(x="Type 1 error (alpha)", y="Statistical power", 
+       title = "(A) alpha level vs. power") + theme_bw()
 
 
 ### Parameter 2: n vs. power
@@ -127,48 +119,56 @@ power_vs_alpha_plot <- ggplot(power_vs_alpha) + geom_line(aes(x=alpha,y=power),s
 n_range <- seq(2,100,by=2)
 
 ## calculate power for a two-sample t test (two-independent-samples-design)
-power_range2 <- pwr.t.test(d=0.5,n=n_range,sig.level=0.05,type="two.sample",alternative="two.sided") # using a medium magnitude of standardised effect size 0.5 
+ # using a medium magnitude of standardized effect size 0.5 
+power_range2 <- pwr.t.test(d=0.5, n=n_range, sig.level=0.05,
+                           type="two.sample", alternative="two.sided")
 
 #### create a dataframe
 power_vs_n <- data.frame(n = n_range, power = power_range2$power)
 
 #### plot
-power_vs_n_plot <- ggplot(power_vs_n) + geom_line(aes(x=n,y=power),show.legend=F) + 
+power_vs_n_plot <- ggplot(power_vs_n) +
+  geom_line(aes(x=n,y=power),show.legend=F) + 
   scale_y_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1)) +
   geom_hline(yintercept = 0.8, colour = "red") +
-  labs(x="Sample size (n)", y="Statistical power", title = "(B) n vs. power") + theme_bw()
+  labs(x="Sample size (n)", y="Statistical power", 
+       title = "(B) n vs. power") + theme_bw()
 
 ### Parameter 3: effect size vs. power
 
-#### create a plausible range of standardised effect sizes
+#### create a plausible range of standardized effect sizes
 es_range <- seq(0.01,1.01,by=0.01)
 
 #### calculate power with alpha 0.05
 power_range3 <- retrodesign::retro_design(A = es_range, s = 0.2, alpha = 0.05)
 
 #### create a dataframe
-power_vs_es <- data.frame(es = es_range, power = power_range3$power, alpha = rep(c("0.05"),length(es_range)))
+power_vs_es <- data.frame(es = es_range, 
+                          power = power_range3$power, alpha = rep(c("0.05"),length(es_range)))
 
 #### plot
-power_vs_es_plot <- ggplot(power_vs_es) + geom_line(aes(x=es,y=power),show.legend=F) + 
+power_vs_es_plot <- ggplot(power_vs_es) + 
+  geom_line(aes(x=es,y=power),show.legend=F) + 
   scale_y_continuous(breaks = seq(0, 1, 0.2), limits = c(0, 1)) +
   geom_hline(yintercept = 0.8, colour = "red") +
-  labs(x="Effect size (d)", y="Statistical power", title = "(C) effect size vs. power") + theme_bw()
+  labs(x="Effect size (d)", y="Statistical power", 
+       title = "(C) effect size vs. power") + 
+  theme_bw()
 
 
 ### put all figures together
-power_plot <- power_vs_alpha_plot / power_vs_n_plot / power_vs_es_plot # plot_annotation(tag_levels = 'A')
+power_plot <- power_vs_alpha_plot / power_vs_n_plot / power_vs_es_plot 
 power_plot
 ```
 
 ### Figure S1
 An example showing how the three parameters affect the statistical power: (A) Type I error ($\alpha$), (B) Sample size ($n$), (C) Magnitude of the standardized effect size ($d$). These figures are simulated using `retro_design()` function in `retrodesign` package @gelman2014beyond. See the corresponding code chunk for detailed code.
 
-From Figure S1A we can see that when an experiment commits a higher Type 1 error (which we do not want), it is easier to achieve a desired statistical power (i.e., Cohen's recommendation: 80% power). Increasing sample size ($n$) and magnitude of standardized effect size are effective ways to increase the statistical power of a given experiment (Figure S1B and S1C). 
+From Figure S1A we can see that when an experiment commits a higher Type 1 error (which we do not want), it is easier to achieve a desired statistical power (i.e., Cohen's recommendation: 80\% power). Increasing sample size ($n$) and magnitude of standardized effect size are effective ways to increase the statistical power of a given experiment (Figure S1B and S1C). 
 
-# 1) Estimating sample sizes in the 'ficticious' experiment with large effects
+# (1) Estimating sample sizes in the 'fictitious' experiment with large effects
 
-When designing an 'hypothetical' diet experiment in your grant proposal, You choose a common significance threshold, $\alpha$ = 0.05 and the nominal power level of 80%.Based on your pilot and external information (e.g., relevant studies or a meta-analysis on maternal effect), you assume maternal obesogenic diet will lead to a 30% increase in males, 20% in females and 10% difference between the sexes. To quantify the diet effect using a standardized effect size (i.e., $d$). We assumed the followings:
+When designing an 'fictitious' diet experiment in your grant proposal, You choose a common significance threshold, $\alpha$ = 0.05 and the nominal power level of 80%. Based on your pilot or external information (e.g., relevant studies or a meta-analysis on maternal effect), you assume maternal obesogenic diet will lead to a 30\% increase in males, 20\% in females and 10\% difference between the sexes. To quantify the diet effect using a standardized effect size (i.e., $d$). We assumed the followings:
 
 control group (both male and female) - mean = 100 (arbitrary unit) and standard deviation (sd) = 30;
 
@@ -196,119 +196,101 @@ Figure_S2
 ```
 
 ### Figure S2 
-Visualization of the assumed means and standard deviation (sd) of each group. Error bars represent sd.
+Visualization of the assumed means and standard deviation (sd) of each group, using the package `Superpower`. Error bars represent sd. Here we assume each group is independent (note that this is not quite true if we take one male and one female from one mother but for convenience, let's assume this)
 
-Using these means and sds, we have the following standardized mean difference $d$, corresponding % differences:
+## Presumed effect sizes (large)
 
-(1) 1.0, corresponding to 30% increase of memory in males after intervention by diet;
+Using these means and sds, we have the following standardized mean difference $d$, corresponding \% differences:
 
-(2) 0.67, corresponding to 20% increase of memory in females after intervention by diet;
+(1) 1.0, corresponding to 30\% increase of memory in males after intervention by diet;
+
+(2) 0.67, corresponding to 20\% increase of memory in females after intervention by diet;
 
 (3) 0.33, corresponding to sex difference or interaction between diet and sex. 
+
+Note that previous experiments suggest usually cognition can more likely to decline but there are cases, offspring cognition of obese mothers could increase so let us keep positive effects for our examples. 
 
 You are planning to use a typical two-sample t-test to examine the statistical significance of the diet effect in males and females. Then you can approximate sample size required for each group using the following formula @lehr1992sixteen: 
 
 $$
-n = \text{16} \frac{Var[θ]} {E[θ]^2} = \text{16} \frac{1} {d^2}
+n = 16 \frac{Var[\theta]} {E[\theta]^2} = \text{16} \frac{1} {d^2}
 $$
-However, for the last effect (interaction effect), this requires comparing 4 groups so that this formula does not work. Yet you can still use this formula by replacing 16 with 32 as interaction involves four groups rather than two.
+However, for the last effect (interaction effect), this requires comparing 4 groups so that this formula does not work. Yet you could still use this formula by replacing 16 with 32 as interaction involves four groups rather than two. 
+
+## Sample size calculation for diet effects
 
 In the following section, we use our custom function (based on the above formula)
-and one existing R package `pwr` to estimate the sample size used in your proposed experiment with different scenarios (sample size mentioned in the fictitious story in the main text). We also validate the sample size estimates using another package `Superpower`.
+and one existing R package `pwr` to estimate the sample size used in your proposed experiment with different scenarios (sample size mentioned in the fictitious story in the main text).
 
-```{r,}
+```{r}
 
-###################
-# power calculation
-###################
-
-# 2 independent group situation (assumed)
-
-# female control: mean = 100, sd = 30
-# female experiment: mean = 120, sd = 30
-# male control: mean = 100, sd = 30
-# male experiment: mean = 130, sd = 30
-
-# to meet the assumption of homogeneity of variance, both treatment and control groups share a common sd. In such a case, the pooled sd also equals 30. Otherwise, this critical assumption would be violated and you need to get weighed average via sd^2 (variance).
-
-# cohen's d female
-(120 - 100)/30
-
-# conhen's d male
+# Cohen's d male
 (130 - 100)/30
 
-# cohen's d sex difference sex difference
-((130 - 100) - (120 - 100))/30
-
+# Cohen's d female
+(120 - 100)/30
 
 # the first set (surprising large effects)
 
 ## male treatment effect
-pwr.t.test(d = 1, sig.level = 0.05, power = 0.8, type = "two.sample", alternative = "two.sided") # 
-pwr_independent_m_d1 <- short_cut(d = 1, method = "normal") # our result from our custom function is very close to the pwr.t.test() function
-
+pwr.t.test(d = 1, sig.level = 0.05, power = 0.8, 
+           type = "two.sample", alternative = "two.sided") 
+# our result from our custom function is very close
+pwr_independent_m_d1 <- short_cut(d = 1, method = "normal")
 
 ## female treatment effect
-pwr.t.test(d = 0.67, sig.level = 0.05, power = 0.8, type = "two.sample", alternative = "two.sided")
+pwr.t.test(d = 0.67, sig.level = 0.05, power = 0.8, 
+           type = "two.sample", alternative = "two.sided")
 pwr_independent_f_d0.67 <- short_cut(d = 0.67, method = "normal")
 
-# sex difference, e.g., interactive effect
-pwr.t.test(d = 0.33, sig.level = 0.05, power = 0.8, type = "two.sample", alternative = "two.sided") # INCORRECT!! Because interaction effect involves four groups rather than two groups. See details in the main text
-pwr_independent_i_d0.33 <- short_cut(d = 0.33, method = "interaction") # close enough
 ```
 
 
-## Sample size to detect 'presumed' effects in an independent experimental design
+## Sample size calculation for sex difference (interaction)
 
-To meet the statistical assumption of data independence of the statistical method (i.e., ANOVA), you can only sample one male and one female pup from one dam/mother when performing a memory assay (e.g., Morris water maze or fear conditioning). Then you can estimate the sample size using the above formula or using the following syntax (see code chunk for the explanation of each argument):
+We cannot use `pwr.t.test` for getting sample size for the sex difference. So first we can use our formula and then, we use the package `Superpower` to obtain a simulation based sample size. 
 
-`pwr.t.test(d, sig.level = 0.05, power = 0.8, type = "two.sample", alternative = "two.sided") </pre> 
+```{r}
+# Cohen's d sex difference (interaction)
+((130 - 100) - (120 - 100))/30
 
-By specifying the argument <code>d</code> with 1 (male treatment effect) & 0.67 (female treatment effect), you can obtain the sample size of $n_\text{male}$ = `r round(pwr_independent_m_d1, 0)` for male mice (F1 generation) and $n_\text{female}$ = `r round(pwr_independent_f_d0.67, 0)` for female mice for each group (maternal obesogenic and control diet) to detect the expected diet effects ($d$ = 1 & 0.67). Multiplying by two, you will get the total mice used: $n_\text{total(male)}$ = `r 2*round(pwr_independent_m_d1, 0)` and $n_\text{total(female)}$ = `r 2*round(pwr_independent_f_d0.67, 0)`. This means you need at least $n_\text{mother}$ = `r 2*round(pwr_independent_f_d0.67, 0)` mother mice (F0 generation) considering one mother can successfully contribute one male and one female pup (Fig 1). Moreover, power analysis suggests that your experiment needs to use $n$ = `r round(pwr_independent_i_d0.33, 0)` (**To discuss with Shinichi to confirm the value mentioned in the main text - 290**) offspring of each sex in both control and treatment groups if you aim for sex difference underlying this diet effect. For four groups (male exposed to a diet intervention, male exposed to a control group, female exposed to a diet intervention, and female exposed to a control group), your proposed experiment totally needs $n_\text{total(interaction)}$ = `r 4*round(pwr_independent_i_d0.33, 0)` offspring mice from $n$ = `r 2*round(pwr_independent_i_d0.33, 0)` mother mice.
+pwr_independent_i_d0.33 <- short_cut(d = 0.33, method = "interaction") 
+pwr_independent_i_d0.33
+```
 
-## Getting sample size for the interaction effect (sex difference) via simulation
+Main results of the outputs of the `ANOVA_exact` when detecting large effects:
 
-Let's use a simulation-based approach to validate the power analysis in the independent experiment design @lakens2021simulation. Your experiment involves a 2b x 2b design which means you have two between-animal factors each with two groups/levels. The first factor (diet intervention) has two groups (obesogenic diet vs. control diet), whereas the second factor (sex) also has two groups (male vs. female). Let's examine what would happen if we collect data from $n$ = `r round(pwr_independent_i_d0.33, 0)` F1 mice in each group (sample size required for sex difference). In other words, when detecting a sex difference, will collecting data from pre-defined number ($n$ = `r round(pwr_independent_i_d0.33, 0)`) of F1 mice in each group be enough for an ANOVA to have sufficient power. 
-
-To achieve this, first we simulate a dataset that has exactly the expected properties - each cell has $n$ = `r round(pwr_independent_i_d0.33, 0)` data points that have the expected mean and sd (Table S1). Then, we perform an ANOVA on this simulated dataset and use the ANOVA results to calculate statistical power. We use <code>ANOVA_design</code> in <code>Superpower</code> package to implement the first step. We use <code>ANOVA_exact</code> in <code>Superpower</code> package The corresponding R code can be found in the following code chunk.
-
-
-Main results of the outputs of the <code>ANOVA_exact</code> when detecting large effects:
-
-```{r, }
+```{r}
 ## scenario 1: large effects
 ### perform ANOVA and calculate power for in dependent design
 power_results <- ANOVA_exact(design, alpha_level = 0.05, verbose = FALSE)
-# power_results$plot + labs(y = "Memory", title = "Simulated data for each group") + scale_x_discrete(labels = c("Control diet", "Obesogenic diet", "Control", "Obesogenic diet")) + theme(axis.title.x = element_blank())
-```
 
-```{r}
 power_results$main_results
 ```
 
-Simulations (using the <code>ANOVA_exact</code> function) show that collecting data from $n$ = `r round(pwr_independent_i_d0.33, 0)` F1 mice (per group)
-has `r round(power_results$main_results$power[3],0)`% power for the interaction or sex difference (see code chunk for R syntax).
+
+Simulation (using the `ANOVA_exact` function) shows that collecting data from $n$ = `r round(pwr_independent_i_d0.33, 0)` F1 mice (per group)
+has `r round(power_results$main_results$power[3],0)`\% power for the interaction or sex difference (see code chunk for R syntax).
 
 We also plot a power curve over a range of sample sizes (Figure S4), from which you can visually explore whether the expected power is achieved for the interaction (bottom panel), and if so, at which sample size.
 
 
-```{r, }
-plot.power <- plot_power(design, min_n = 5, max_n = 300, desired_power = 80, plot = FALSE)
-
-### power_results2 <- ANOVA_power(design, alpha = 0.05, nsims = 1000, seed = 1234) # ANOVA_power() also can perform analysis, but first to repeatedly simulate data for each condition based on the means, sample size, standard deviation, and correlation. Then conduct power analysis for each condition.
-```
-
-
 ```{r}
+plot.power <- plot_power(design, min_n = 5, max_n = 300, 
+                         desired_power = 80, plot = FALSE)
+
 plot.power$plot_ANOVA + labs(x = "Sample size per group")
 ```
 
 ### Figure S3
-Power curves for large inter-generational effect in a dependent design (diet and sex are manipulated between animals). Top panel = the main effect - diet; Middle panel = the main effect - sex; Bottom panel = the interactive effect, sex difference. The orange horizontal lines denote the expected statistical power (80%).
+Power curves for large inter-generational effect in a dependent design (diet and sex are manipulated between animals). Top panel = the main effect - diet; Middle panel = the main effect - sex; Bottom panel = the interactive effect, sex difference. The orange horizontal lines denote the expected statistical power (80\%). Note that the main diet effect is an average effect over the two sexes. 
 
-# 2) Estimating sample sizes in the 'ficticious' experiment with realstic (small) effects
+As you see, the simulation-based method suggests we need 284 subjects to reach 80\% to detect the interaction effect, which confirm what we obtained form the formula was close enough. 
 
-With the above evidence in hand (more details see the main text), you may realize that it is more reasonable to use a realistic and small effect size to approximate sample size. This time you assume maternal obesogenic diet will have more realistic effects on pups' memory: a 5% increase in males, 3% in females and thus 1% difference between the sexes. 
+
+# (2) Estimating sample sizes in the 'ficticious' experiment with realstic (small) effects
+
+This time, we assume maternal obesogenic diet will have more realistic effects on pups' memory: a 5\% increase in males, 3\% in females and thus 1\% difference in the diet effect between the sexes (interaction). 
 
 To calculate $d$, you assume (Figure S8): 
 
@@ -321,7 +303,7 @@ female treatment group - mean = 103 and sd = 30.
 ```{r}
 ## scenario 2: small effects
 ### set up an independent design
-design4 <- ANOVA_design(
+design2 <- ANOVA_design(
   design = "2b*2b", # independent design
   n =7128, # the sample size used for testing sex difference
   mu = c(105, 103, 100, 100), 
@@ -329,129 +311,84 @@ design4 <- ANOVA_design(
   labelnames = c("diet", "obesogenic ", "control ", "sex", "male", "female"),
   plot = FALSE)
 
-meanplot_smallES <- design4$meansplot + labs(x = "Groups", y = "Mean", title = "Realistic small effect")
+meanplot_smallES <- design2$meansplot + 
+  labs(x = "Groups", y = "Mean", title = "Realistic small effect")
 meanplot_smallES
 ```
 
-### Figure S8 
-Visualization of the expected means and standard deviation (sd) of each group when assuming maternal obesogenic diet has a realistic and small inter-generational effect. Error bars represent ± sd.
+### Figure S4
+Visualization of the expected means and standard deviation (sd) of each group using the package `Superpower` under more realistic scenarios. Error bars represent sd. Here we assume each group is independent (note that this is not quite true if we take one male and one female from one mother but for convenience, let's assume this).
 
-You still need to assume all groups share a common sd = 30 (population standard deviation). Otherwise, you will violate the assumption of homogeneity of variances. Then you can obtain the following standardized mean difference $d$:
+# Presumed effect sizes (small)
 
-(1) 0.16, corresponding to 5% increase of memory in males after intervention by diet;
+As with the above, we assumed all groups share a common sd = 30 (population standard deviation). Then you can obtain the following standardized mean difference $d$:
 
-(2) 0.1, corresponding to 3% increase of memory in females after intervention by diet;
+(1) 0.16, corresponding to 5\% increase of memory in males after intervention by diet;
 
-(3) 0.06, corresponding to 2% sex difference or interaction between diet and sex.
+(2) 0.1, corresponding to 3\% increase of memory in females after intervention by diet;
 
-Following similar procedures in estimating sample sizes for large effects (see above), you can obtain sample sizes for small effects. That is, replacing all the values of large effects in corresponding R syntax with the values of small effects.
+(3) 0.06, corresponding to 2\% sex difference or interaction between diet and sex.
 
-```{r,}
+## Sample size calculation for diet effects
+
+Following similar procedures in estimating sample sizes for large effects (see above), you can obtain sample sizes with these new presumed effect sizes
+
+```{r}
+# Cohen's d male
+(105 - 100)/30
+
+# Cohen's d female
+(103 - 100)/30
 
 # the first set (realistic small effects)
 
 ## male treatment effect
-pwr.t.test(d = 0.167, sig.level = 0.05, power = 0.8, type = "two.sample", alternative = "two.sided")
+pwr.t.test(d = 0.167, sig.level = 0.05, power = 0.8, 
+           type = "two.sample", alternative = "two.sided")
 pwr_independent_m_d0.167 <- short_cut(d = 0.167, method = "normal")
 
 ## female treatment effect
-pwr.t.test(d = 0.1, sig.level = 0.05, power = 0.8, type = "two.sample", alternative = "two.sided")
+pwr.t.test(d = 0.1, sig.level = 0.05, power = 0.8, 
+           type = "two.sample", alternative = "two.sided")
 pwr_independent_f_d0.1 <- short_cut(d = 0.1, method = "normal")
 
-# sex difference
-pwr.t.test(d = 0.067, sig.level = 0.05, power = 0.8, type = "two.sample", alternative = "two.sided") # INCORRECT!! interaction effect involves four groups, but this function only use two groups
-pwr_independent_i_d0.067 <- short_cut(d = 0.067, method = "interaction")
 ```
 
+## Sample size calculation for sex difference (interaction)
 
-## Sample size to detect small effects in an independent experimental design
-
-Consider independent experiment design. You can can estimate the sample size (see code chunk for full syntax) with:
-
-<pre class="code rsplus"> pwr.t.test(d, sig.level = 0.05, power = 0.8, type = "two.sample", alternative = "two.sided") </pre> 
-
-By specifying the argument <code>d</code> with 0.167 (male treatment effect) & 0.1 (female treatment effect), you can obtain the sample sizes of $n_\text{male}$ = `r round(pwr_independent_m_d0.167, 0)` for male mice (F1 generation) and $n_\text{female}$ = `r round(pwr_independent_f_d0.1, 0)` for female mice for each group (maternal obesogenic and control diet) to detect the expected diet effects ($d$ = 0.167 & 0.1). Multiplying by two, you will get the total mice used: $n_\text{total(male)}$ = `r 2*round(pwr_independent_m_d0.167, 0)` and $n_\text{total(female)}$ = `r 2*round(pwr_independent_f_d0.1, 0)`. This means you need at least $n_\text{mother}$ = `r 2*round(pwr_independent_f_d0.1, 0)` mother mice (F0 generation) considering one mother can successfully contribute one male and one female pup (Fig 1). Moreover, power analysis suggests that your experiment needs to use $n$ = `r round(pwr_independent_i_d0.067, 0)` (**this is probably wrong. Please Shinichi help provide a correct formula or function to estimate the number of interaction when ready**) offspring of each sex in both control and treatment groups if you aim for sex difference underlying this diet effect. For four groups (male exposed to a diet intervention, male exposed to a control group, female exposed to a diet intervention, and female exposed to a control group), your proposed experiment totally needs $n_\text{total(interaction)}$ = `r 4*round(pwr_independent_i_d0.067, 0)` offspring mice from $n$ = `r 2*round(pwr_independent_i_d0.067, 0)` mother mice.
-
-### Getting the sample size for interaction effect
-
-We use a similar simulation-based approach to empirically calculate power for independent experiment design for small effects. Your experiment involves a 2b X 2b design which means you have two between-animal factors each with two groups/levels. The first factor (diet intervention) has two groups (obesogenic diet vs. control diet), whereas the second factor (sex) also has two groups (male vs. female). Let's examine what would happen if we collect data from $n$ = `r round(pwr_independent_i_d0.067, 0)` F1 mice in each group (sample size required for sex difference; see sample size required in an independent design). In other words, when detecting a sex difference, will collecting data from pre-defined number ($n$ = `r round(pwr_independent_i_d0.067, 0)`) of F1 mice in each group be enough for an ANOVA to have sufficient power. 
-
-### Table S2
-A simulated dataset that has exactly the expected mean and standard deviation specific to the realistic and small inter-generational effect (Figure S8). For the code to reproduce the simulated dataset, see the corresponding code chunk.
+We can also use our formula to estimate (assuming independence of all groups) 
 
 ```{r}
-### retrieve the simulated dataset
-dat_smallES <- design4$dataframe
-names(dat_smallES) <- c("mouseID", "group", "memory", "diet", "sex")
-dat_smallES$memory <- round(dat_smallES$memory, 1)
+# Cohen's d sex difference (interaction)
+((105 - 100) - (102 - 100))/30
+
+# sex difference
+pwr_independent_i_d0.067 <- short_cut(d = 0.067, method = "interaction")
+pwr_independent_i_d0.067
 ```
 
-Main results of the outputs of the <code>ANOVA_exact</code> when assuming small effects:
+We use a similar simulation-based approach to empirically calculate power for the interaction effect using `Superpower`. Main results of the outputs of the `ANOVA_exact` when assuming small effects:
 
 ```{r}
 ## scenario 2: small effects
 ### perform ANOVA and calculate power for in dependent design
-power_results4 <- ANOVA_exact(design4, alpha_level = 0.05, verbose = FALSE)
-power_results4$main_results
+power_results2 <- ANOVA_exact(design2, alpha_level = 0.05, verbose = FALSE)
+power_results2$main_results
 ```
 
 Simulations (using the <code>ANOVA_exact</code> function) show that collecting data from $n$ = `r round(pwr_independent_i_d0.067, 0)` F1 mice (per group)
-has `r round(power_results4$main_results$power[3],2)`% power for the interaction or sex difference (see code chunk for R syntax).
+has `r round(power_results2$main_results$power[3],2)`\% power for the interaction or sex difference. So the simulation result seems to catch with the sample size estimated by the formula. 
 
-Power curve (Figure S9) shows that your expected power is rarely achieved for the interaction at a realistic sample size range ($n$ = 10 - 300) (bottom panel). 300 mice per group (total 1200 mice) only has 9% power.
+# (3) Corrleated samples and statistical power
 
-```{r, results='hide'}
-plot.power4 <- plot_power(design4, min_n = 10, max_n = 300, desired_power = 80, plot = FALSE)
-```
-
-```{r, results='hide'}
-plot.power4$plot_ANOVA + labs(x = "Sample size per group", title = "Small effects")
-```
-
-### Figure S9
-Power curves for small intergenerational effect in a dependent design (diet and sex are manipulated between animals). Top panel = the main effect - diet; Middle panel = the main effect - sex; Bottom panel = the interactive effect, sex difference. The orange horizontal lines denote the expected statistical power (80%).
-
-# I) Sample size to detect small effects in a dependent experimental design
-
-You can also use a dependent design to reduce your sample size. But the sample size used to detect a realistic and small effect is still very huge. Again, there is no way of doing such a ‘bigger-than-your-university-facility-can-take-it’ experiment, especially as a new PI. See below for the detailed numbers.
-
-## Getting the sample size estimate in dependent design
-
-Let's empirically calculate power for this dependent experiment design, using the <code>ANOVA_exact</code> function. This dependent experiment design involves a 2w x 2w design. This means both diet and sex are manipulated within animals. Therefore, memory measurements from F1 mice are correlated within each other. 
-
-If assuming a relatively low correlation ($r$ = 0.25) for within-animal factors, you need $n$ = 5346 to reach the expected statistical power (80%) for interaction (i.e., sex difference).
-
-Main results of the outputs of the <code>ANOVA_exact</code> with $r$ = 0.25 and $n$ = 5346:
-
-```{r}
-## scenario 2: small effects
-### perform ANOVA and calculate power for in independent design
-# assuming the siblings are very similar to each other - r = 0.25
-design5 <- ANOVA_design(
-  design = "2w*2w", # dependent design means within-animal factors have correlations
-  n =5346, 
-  r = 0.25,
-  mu = c(105, 103, 100, 100), 
-  sd = 30,
-  labelnames = c("diet", "obesogenic", "control", "sex", "male", "female"),
-  plot = FALSE)
-
-power_results5 <- ANOVA_exact(design5, alpha_level = 0.05, verbose = FALSE)
-power_results5$main_results
-
-# my laptop was not able to run such a huge simulation
-# plot.power5 <- plot_power(design5, min_n = 4000, max_n = 6000, desired_power = 80)
-# plot.power5$plot_ANOVA + labs(x = "Sample size per group", title = "correlation = 0.25")
-```
-
-When assuming a relatively high correlation ($r$ = 0.5) for within-animal factors, $n$ = 3564 can reach the expected statistical power (80%) for interaction (i.e., sex difference).
+As mentioned, correlated samples can increase the statistical power of an experiment so that we require fewer samples. Here, we assume that sibling traits are correlated ($r$ = 0.5) regardless of sex. We find $n$ = 3564 can reach the expected statistical power (80\%) for interaction (i.e., sex difference). This number (3567) corresponds to 
 
 ```{r}
 ## scenario 1: small effects
 ### perform ANOVA and calculate power for in independent design
 ### assuming the siblings are very similar to each other - r = 0.5
-design6 <- ANOVA_design(
-  design = "2w*2w", # dependent design means within-animal factors have correlations
+design3 <- ANOVA_design(
+  design = "2w*2w", # dependent design 
   n =3564, 
   r = 0.5,
   mu = c(105, 103, 100, 100), 
@@ -459,78 +396,36 @@ design6 <- ANOVA_design(
   labelnames = c("diet", "obesogenic", "control", "sex", "male", "female"),
   plot = FALSE)
 
-power_results6 <- ANOVA_exact(design6, alpha_level = 0.05, verbose = FALSE)
-power_results6$main_results
-# my laptop was not able to run such a huge simulation
-# plot.power6 <- plot_power(design6, min_n = 4000, max_n = 6000, desired_power = 80)
-# plot.power6$plot_ANOVA + labs(x = "Sample size per group", title = "correlation = 0.5")
+power_results3 <- ANOVA_exact(design3, alpha_level = 0.05, verbose = FALSE)
+power_results3$main_results
 ```
 
+This number (3567) corresponds to the value calculated from the following formula:
 
-# II) Samll sample size and inflated statstical signficant effect
+$$
+n_{interaction} =  \frac{32} {d^2}(1 - r)
+$$
 
-As pointed out in the main text, the requirement of power analysis leads PIs to focus too much on the pursuit of novel insights rather than a robust experimental design. As a result, PIs often obtain exaggerated effect sizes using the sample size estimated from the power analysis. We provide verbal evidence to support this argument in the main text. Here, we use a numerical example (the maternal diet experiment mentioned above) to intuitively corroborate this point.
-
-```{r, fig.dim=c(8.5,5)}
-### make a using a non-centrality t-distribution to explain the relationship between sampling distribution, true effect, observed effect, critical value and statistical significance
-mu_true <- 0.2      # 'true' effect size underlying the intergenerational effect
-sd_p <- 1 # population standard deviation
-
-### scenario 1: surprisingly large effect
-mu_obs <- 1          # observed effect size for treatment male effect
-n <- 16              # number of mice used in treatment male effect (see pwr_independent_m_d1 <- short_cut(d = 1, method = "normal"))
-se_obs <- 1/sqrt(16)        # sampling uncertainty / standard error of the effect size
-Z <- qt(1-0.05/2, n-1)*se_obs    # critical value / threshold
-
-dat_male <- seq(-5, 5, len=1000) 
-ncp <- mu_true   # non-centrality parameter for t-distribution
-plot(dat_male, dt(dat_male, n-1, ncp=ncp), type='l', xlab='Effect size (d)', ylab='')
-segments(mu_true, 0, mu_true, dt(mu_true, n-1, ncp=ncp), c='blue', lty=2)
-segments(Z, 0, Z, dt(Z, n-1, ncp=ncp), c='red', lty=2)
-text(x=-3.5, y=0.3, labels="Treatment male effect (n = 16)")
-
-arrows(x0=-1.2, y0=0.05, x1=0.2, y1=0.05, col="blue", lwd=1)
-text(x=-0.8, y=0.08, labels="True effect size", col="blue")
-
-arrows(x0=2, y0=0, x1=0.55, y1=0.0, col="red", lwd=1)
-text(x=1.5, y=0.03, labels="Observed effect size", col="red", lwd=1)
-
-arrows(x0=2.2, y0=0.3, x1=1.7, y1=0.15, col="black", lwd=1)
-text(x=2, y=0.32, labels="Sampling distribution", col="black")
-```
-
-## Figure S6
-An example showing how small study (small sample size) exaggerate observed effect size to reach statistical significance ($p_\text{two-tailed}%$ < 0.05).
-
-Let's consider that you get funded. Awesome! Now you are running this maternal diet experiment. However, the measurements in your pilot are so noisy that this inter-generational effect you used to for power analysis is actually exaggerated. The true effect underlying this maternal diet experiment is subtle and variable: $d_\text{true}$ = 0.2, $sd[d]_\text{population}$ = 1 for male treatment effect. Based on your power analysis, you need to use $n_\text{male}$ = `r round(pwr_independent_m_d1, 0)` male mice to investigate male treatment effect (i.e., independent design). Running an experiment with this sample size ($n_\text{male}$ = `r round(pwr_independent_m_d1, 0)`) will have a sampling uncertainty (standard error of the effect size) of $se[d]$ = $sd[d]_\text{sample}$ = $sd[d]_\text{population}/\sqrt{n_\text{male}}$ = `r 1/sqrt(round(pwr_independent_m_d1, 0))`. As shown in Figure S6, to obtain a significant intergenerational effect, your observed effect size $d_\text{observed}$ need to exceed `r qt(1 - 0.05/2,  round(pwr_independent_m_d1, 0) - 1)*(1/sqrt(round(pwr_independent_m_d1, 0)))` to achieve significance at $p_\text{two-tailed}%$ < 0.05 under the null hypothesis significance test framework (in this case, sampling follows a t distribution with a freedom of $df$ = `r round(pwr_independent_m_d1, 0) - 1`). `r qt(1 - 0.05/2,  round(pwr_independent_m_d1, 0) - 1)*(1/sqrt(round(pwr_independent_m_d1, 0)))` is a critical effect size level ($d_\text{threshold}$), which can be obtained through $se[d]$ (or $sd[d]_\text{sample}$) times a critical value ($Z_\text{threshold}$), which represents the 97.5th percentile of a t-distribution with degrees of freedom $df$ = `r round(pwr_independent_m_d1, 0) - 1`. You may become one-in-twenty lucky winner who happen to get $d_\text{observed}$ > $d_\text{threshold}$ at $p_\text{two-tailed}%$ < 0.05 so you successfully publish your $d_\text{observed}$ although it is ‘inflated’. Unfortunately, later PIs, who are interested in a similar intergenerational effect, will use your published ‘inflated’ effect size as a 'true' effect size to calculate sample size (using power analysis) in their grant proposals. Collectively, you initiate a vicious cycle of power analysis (Fig 2) and later PIs unintentionally keep this unfortunate cycle going and, ultimately, exacerbating replication crisis (referred to as winner’s curse; see the main text). 
-
-Statistically speaking, your experiment with $n_\text{male}$ = `r round(pwr_independent_m_d1, 0)` must overestimate this inter-generational effect by `r ( qt(1 - 0.05/2,  round(pwr_independent_m_d1, 0) - 1)*(1/sqrt(round(pwr_independent_m_d1, 0))) ) / (0.2)` ($d_\text{threshold}/d_\text{true}$) to achieve significance at $p_\text{two-tailed}%$ < 0.05. Otherwise, you rarely can publish your results according to the filtering effect of publication process based statistical significance. Alternatively, you can increase the sample size $n$ to decrease sampling uncertainty (standard error of the effect size) of $sd[d]_\text{sample}$ = $se[d]$ = $sd[d]_\text{population}/\sqrt{n_\text{male}}$ to avoid overestimation of the magnitude of the effect size (Fig S7; the script to reproduce this figure can be found at the above code chunk). However, in reality, your experiment often needs an unrealistically large sample size, which leads to another issue: there is no incentives for reporting realistic sample sizes required for making new and reliable discoveries (see next section). 
+Using this formula, we can assume a lower correlation ($r$ = 0.25) and then, we find $n$ = 5346. As before, we can verify this, using `ANOVA_design`:
 
 ```{r}
-### a costumed function to estimate exaggeration ratio
-overest <- function(n, d_true = 0.2, s_pupulation = 1, alpha=0.05) {
-  z_critical <- qt(1 - alpha/2, n - 1)*(s_pupulation/sqrt(n))
-  overestimate <- z_critical/d_true
-  overestimate
-}
+## scenario 2: small effects
+### perform ANOVA and calculate power for in independent design
+# assuming the siblings are very similar to each other - r = 0.25
+design4 <- ANOVA_design(
+  design = "2w*2w",   # dependent design 
+  n =5346, 
+  r = 0.25,
+  mu = c(105, 103, 100, 100), 
+  sd = 30,
+  labelnames = c("diet", "obesogenic", "control", "sex", "male", "female"),
+  plot = FALSE)
 
-#### set a range of sample size (20 to 120)
-n_range <- seq(10,100,by=1)
-
-#### calculate the magnitude of overestimate at various sample size
-overest_vs_n <- data.frame(n = n_range, overest = overest(n_range))
-
-#### plot
-overest_vs_n_plot <- ggplot(overest_vs_n) + geom_line(aes(x=n,y=overest),show.legend=F) + 
-  scale_y_continuous(breaks = seq(1, 4, 0.2)) +
-  geom_hline(yintercept = 1, colour = "red") +
-  labs(x="sample size (n)", y="Exaggeration ratio", title = "n vs. overestimate") + theme_bw()
-
-overest_vs_n_plot
+power_results4 <- ANOVA_exact(design4, alpha_level = 0.05, verbose = FALSE)
+power_results4$main_results
 ```
 
-## Figure S7
-Exaggeration ratio of the true effect as a function of sample size ($d$)
+As you see, with $n$ = 5346, we have ~80\% power. We note that, as mention in the text, for more complex designs (e.g. including different strains of mice), we cannot use the formula or the functions form `Superpower`. We need to use other software packages which could accommodate such design features. 
 
 # R Session Information
 

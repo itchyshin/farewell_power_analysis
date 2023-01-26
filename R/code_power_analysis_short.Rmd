@@ -168,7 +168,7 @@ From Figure S1A we can see that when an experiment commits a higher Type 1 error
 
 # (1) Estimating sample sizes in the 'fictitious' experiment with large effects
 
-When designing an 'fictitious' diet experiment in your grant proposal, You choose a common significance threshold, $\alpha$ = 0.05 and the nominal power level of 80%. Based on your pilot or external information (e.g., relevant studies or a meta-analysis on maternal effect), you assume maternal obesogenic diet will lead to a 30\% increase in males, 20\% in females and 10\% difference between the sexes. To quantify the diet effect using a standardized effect size (i.e., $d$). We assumed the followings:
+When designing an 'fictitious' diet experiment in your grant proposal, You choose a common significance threshold, $\alpha$ = 0.05 and the nominal power level of 80%. Based on your pilot or external information (e.g., relevant studies or a meta-analysis on maternal effect), you assume maternal obesogenic diet will lead to a 30\% increase in the number of mistakes in a memory task in males, 20\% in females and 10\% difference between the sexes. To quantify the diet effect using a standardized effect size (i.e., $d$). We assumed the followings:
 
 control group (both male and female) - mean = 100 (arbitrary unit) and standard deviation (sd) = 30;
 
@@ -202,13 +202,11 @@ Visualization of the assumed means and standard deviation (sd) of each group, us
 
 Using these means and sds, we have the following standardized mean difference $d$, corresponding \% differences:
 
-(1) 1.0, corresponding to 30\% increase of memory in males after intervention by diet;
+(1) 1.0, corresponding to a 30\% increase in the number of mistakes in a memory task in males after a diet intervention;
 
-(2) 0.67, corresponding to 20\% increase of memory in females after intervention by diet;
+(2) 0.67, corresponding to a 20\% increase in the number of mistakes in a memory task in females after a diet intervention;
 
-(3) 0.33, corresponding to sex difference or interaction between diet and sex. 
-
-Note that previous experiments suggest usually cognition can more likely to decline but there are cases, offspring cognition of obese mothers could increase so let us keep positive effects for our examples. 
+(3) 0.33, corresponding to a 10\% sex difference or interaction between diet and sex. 
 
 You are planning to use a typical two-sample t-test to examine the statistical significance of the diet effect in males and females. Then you can approximate sample size required for each group using the following formula @lehr1992sixteen: 
 
@@ -323,9 +321,9 @@ Visualization of the expected means and standard deviation (sd) of each group us
 
 As with the above, we assumed all groups share a common sd = 30 (population standard deviation). Then you can obtain the following standardized mean difference $d$:
 
-(1) 0.16, corresponding to 5\% increase of memory in males after intervention by diet;
+(1) 0.16, corresponding to 5\% increase in the number of mistakes in a memory task in males after a diet intervention;
 
-(2) 0.1, corresponding to 3\% increase of memory in females after intervention by diet;
+(2) 0.1, corresponding to 3\% increase in the number of mistakes in a memory task in females after a diet intervention;
 
 (3) 0.06, corresponding to 2\% sex difference or interaction between diet and sex.
 
